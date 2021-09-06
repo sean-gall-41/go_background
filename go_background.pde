@@ -78,6 +78,7 @@ void setup() {
   
   try { 
     // invoke the python script
+    //TODO: bug fix on input in python script with conda execution via Java
     invokeScript(condaRunCommand("go-manip")); 
   } catch (Exception e) {
     System.out.println("Exception thrown: " + e);
