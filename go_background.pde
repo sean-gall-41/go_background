@@ -13,9 +13,6 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-//import org.junit.Test;
-//import org.junit.Assert;
-
 public String getPythonScriptName() {
   File f = new File(sketchPath());
   FilenameFilter filter = new FilenameFilter() {
