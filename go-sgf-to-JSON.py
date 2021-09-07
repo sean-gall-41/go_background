@@ -1,46 +1,30 @@
 import os
 import sys
-import argparse
 from sgfmill import sgf
 import json
 
 SGF_FILE_TYPE = ".sgf"
 JSON_FILE_TYPE = ".json"
 
-# search downloads folder for all SGF files and inform user
-DOWNLOAD_PATH = os.environ['HOMEPATH'] + '\\Downloads'
-print("Searching directory '{downloads}' for files of type '{sgf}'".format(downloads=DOWNLOAD_PATH,sgf=SGF_FILE_TYPE))
-sgf_files = [file for file in os.listdir(DOWNLOAD_PATH) if \
+# search the data folder for .sgf file, exit if none
+#TODO: python process runs from the base Processing folder: need to get to the
+# folder that the processing sketch is located in
+DATA_PATH = 'C:\\Users\\Parma_Shon\\Documents\\Processing\\sketches\\go_background\\data'
+print("Searching directory '{data}' for files of type '{sgf}'".format(data=DATA_PATH,sgf=SGF_FILE_TYPE))
+sgf_files = [file for file in os.listdir(DATA_PATH) if \
              file.endswith(SGF_FILE_TYPE)]
 
 # if query empty, report and exit
 if not sgf_files:
-    print("No files in directory '{downloads}' with extension '{sgf}'.".format(downloads=DOWNLOAD_PATH,sgf=SGF_FILE_TYPE))
+    print("No files in directory '{downloads}' with extension '{sgf}'.".format(downloads=DATA_PATH,sgf=SGF_FILE_TYPE))
     print("Exiting program")
-    sys.exit()
+    sys.exit(1)
 
-print("Found {num_entries} files. Which one do you wish to display? (enter a number)".format(num_entries=len(sgf_files)))
-user_choice = 0
-while True:   
-    try:
-        user_choice = int(input())
+print("Found {num_entries} files. Taking first one".format(num_entries=len(sgf_files)))
 
-        if user_choice not in range(1, len(sgf_files)+1):
-            print("Must enter a value between {first} and {last}. Please try again.".format(first=1, last=len(sgf_files)))
-        else:
-            break
-    except ValueError:
-        print("Must enter an integer. Please try again.")
+# we're just going to take the first entry found assuming it exists
+absolute_ifile_path = DATA_PATH+'\\'+sgf_files[0]
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument("file", help="The file to be converted to JSON.")
-# args = parser.parse_args()
-
-# if not args.file.endswith(".sgf"):
-#     print("file must end with '.sgf'")
-#     sys.exit()
-
-absolute_ifile_path = DOWNLOAD_PATH+'\\'+sgf_files[user_choice-1]
 try:
     with open(absolute_ifile_path, "rb") as ifile:
         game = sgf.Sgf_game.from_bytes(ifile.read())
@@ -98,13 +82,15 @@ else:
 
     # create outfile name as same as in file but with .json extension
     # (if we want compatibility with linux we may have to rethink this)
-    # out_file = args.file[:-4] + '.json'
-    data_folder = os.getcwd() + '\{}'.format('Data')
-    if data_folder:
-        out_file = data_folder + '\\' + sgf_files[user_choice-1].replace(SGF_FILE_TYPE, JSON_FILE_TYPE)
+    # data_folder = os.getcwd() + '\{}'.format('data')
+    # if data_folder:
+    out_file = DATA_PATH + '\\' + sgf_files[0].replace(SGF_FILE_TYPE, JSON_FILE_TYPE)
 
     # TODO: encapsulate in try except block
     with open(out_file, "w") as ofile:
         json.dump(fields, ofile, indent=4)
+    
+    print("finished dumping contents into json file.")
+    print("\nProgram Complete. Exiting...")
 
     

@@ -13,24 +13,29 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-public String getPythonScriptName() {
-  File f = new File(sketchPath());
+// Note that this function returns a file relative to the sketch path
+public String getFile(String relSuper, final String ext) {
+  File f;
+  if (relSuper.equals("")) {
+    f = new File(sketchPath());
+  } else f = new File(sketchPath() + "\\" + relSuper);
+  
   FilenameFilter filter = new FilenameFilter() {
     @Override
     public boolean accept(File f, String name) {
-      return name.endsWith(".py");
+      return name.endsWith(ext);
     }
   };
   
   String[] pathnames = f.list(filter);
-  // assume not empty for now
-  return sketchPath() + "\\" + pathnames[0];
+  // we'll take the first entry, for now (we only have one Python file and one json file
+  return f.getPath() + "\\" + pathnames[0];
 }
 
 ArrayList<String> pythonCommand() {
   ArrayList<String> command = new ArrayList<String>();
   command.add("python");
-  command.add(getPythonScriptName());
+  command.add(getFile("", ".py"));
   return command;
 }
 
@@ -69,8 +74,6 @@ public void invokeScript(ArrayList<String> list) throws Exception {
    
  }
 
-
-
 void setup() {
   // environment setup
   fullScreen();
@@ -83,10 +86,10 @@ void setup() {
   } catch (Exception e) {
     System.out.println("Exception thrown: " + e);
   }
+  
   // obtain relevant vars from json file(s)
-  //TODO: get filename from the data file directly, not hardcode
-  String filename = "Jud-1962-1.json";
-  json = loadJSONObject(filename);
+  String fileName = getFile("data", ".json");
+  json = loadJSONObject(fileName);
   moves = intArrayFromJSONArray(json.getJSONArray("MVS"));
   
   //board geometry setup
